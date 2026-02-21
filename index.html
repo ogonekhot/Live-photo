@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <script src="https://aframe.io"></script>
+  <script src="https://raw.githack.com"></script>
+  <body style="margin: 0px; overflow: hidden;">
+    <a-scene embedded arjs>
+      <!-- Ссылка на ваш .patt файл -->
+      <a-marker type="pattern" url="my-photo.patt">
+        <!-- Ссылка на ваше видео -->
+        <a-video src="my-video.mp4" width="1.6" height="0.9" rotation="-90 0 0"></a-video>
+      </a-marker>
+      
+    </a-scene>
+  </body>
+</html>
