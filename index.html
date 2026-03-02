@@ -1,33 +1,141 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>AR фото</title>
 
-    <!-- A-Frame -->
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-    <!-- AR.js for A-Frame -->
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  </head>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+      background-color: rgba(235, 201, 255, 0.637);
+    }
 
-  <body style="margin:0; overflow:hidden;">
-    <a-scene
-      embedded
-      arjs="sourceType: webcam; debugUIEnabled: false;"
-    >
-      <a-marker type="pattern" url="pattern-marker.patt">
-        <a-video
-          src="services-instagram-post-DRxpN3PE4TK-0.mp4"
-          width="1.6"
-          height="0.9"
-          rotation="-90 0 0"
-          muted="true"
-          playsinline="true"
-        ></a-video>
-      </a-marker>
+    body {
+      position: fixed;
+      inset: 0;
+    }
 
-      <a-entity camera></a-entity>
-    </a-scene>
-  </body>
+    a-scene {
+      position: fixed !important;
+      inset: 0;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .controls {
+      position: fixed;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      z-index: 20;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 16px;
+      background: rgba(255, 135, 201, 0.418);
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <button id="startBtn">Старт</button>
+  </div>
+
+  <a-scene
+    mindar-image="imageTargetSrc: ./targets.mind; autoStart: false; uiScanning: false; uiLoading: false;"
+    color-space="sRGB"
+    renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+  >
+    <a-assets>
+      <video
+        id="aliveVideo"
+        src="./video.mp4"
+        preload="auto"
+        loop
+        muted
+        playsinline
+        webkit-playsinline
+        crossorigin="anonymous"
+      ></video>
+    </a-assets>
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <a-entity id="target0" mindar-image-target="targetIndex: 0">
+      <a-video
+        src="#aliveVideo"
+        width="1"
+        height="1"
+        position="0 0 0.01"
+        ></a-video>     
+    </a-entity>
+  </a-scene>
+
+  <script>
+    const sceneEl = document.querySelector("a-scene");
+    const startBtn = document.getElementById("startBtn");
+    const target = document.getElementById("target0");
+    const video = document.getElementById("aliveVideo");
+
+    let started = false;
+    let audioUnlocked = false;
+
+    startBtn.addEventListener("click", async () => {
+        await startBtn.remove();
+
+        const mindarSystem = sceneEl.systems["mindar-image-system"];
+        if (!mindarSystem || started) return;
+
+        try {
+        video.muted = false;
+        video.playsInline = true;
+
+        try {
+            await video.play();
+            video.pause();
+            video.currentTime = 0;
+            audioUnlocked = true;
+        } catch (e) {
+            console.warn("Аудио не разблокировалось:", e);
+        }
+
+        await mindarSystem.start();
+        started = true;
+        } catch (e) {
+        console.error(e);
+        }
+    });
+
+    target.addEventListener("targetFound", async () => {
+        try {
+        video.currentTime = 0;
+        await video.play();
+        } catch (e) {
+        console.error("Ошибка запуска видео:", e);
+        }
+    });
+
+    target.addEventListener("targetLost", () => {
+        video.pause();
+        video.currentTime = 0;
+    });
+    </script>
+</body>
 </html>
