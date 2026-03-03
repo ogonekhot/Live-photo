@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>AR фото</title>
+  <title>AR несколько видео</title>
 
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -48,6 +48,7 @@
       padding: 12px 16px;
       font-size: 16px;
       background: rgba(255, 135, 201, 0.418);
+      cursor: pointer;
     }
   </style>
 </head>
@@ -65,11 +66,70 @@
   >
     <a-assets>
       <video
-        id="aliveVideo"
-        src="./video.mp4"
+        id="video0"
+        src="./video0.mp4"
         preload="auto"
         loop
-        muted
+        playsinline
+        webkit-playsinline
+        crossorigin="anonymous"
+      ></video>
+
+      <video
+        id="video1"
+        src="./video1.webm"
+        preload="auto"
+        loop
+        playsinline
+        webkit-playsinline
+        crossorigin="anonymous"
+      ></video>
+
+      <video
+        id="video2"
+        src="./video2.mp4"
+        preload="auto"
+        loop
+        playsinline
+        webkit-playsinline
+        crossorigin="anonymous"
+      ></video>
+
+      <video
+        id="video3"
+        src="./video3.mp4"
+        preload="auto"
+        loop
+        playsinline
+        webkit-playsinline
+        crossorigin="anonymous"
+      ></video>
+
+      <video
+        id="video4"
+        src="./video4.mp4"
+        preload="auto"
+        loop
+        playsinline
+        webkit-playsinline
+        crossorigin="anonymous"
+      ></video>
+
+      <video
+        id="video5"
+        src="./video5.mp4"
+        preload="auto"
+        loop
+        playsinline
+        webkit-playsinline
+        crossorigin="anonymous"
+      ></video>
+
+      <video
+        id="video6"
+        src="./video6.mp4"
+        preload="auto"
+        loop
         playsinline
         webkit-playsinline
         crossorigin="anonymous"
@@ -80,62 +140,157 @@
 
     <a-entity id="target0" mindar-image-target="targetIndex: 0">
       <a-video
-        src="#aliveVideo"
+        src="#video0"
+        width="1"
+        height="1"
+        position="0 0.1 0"
+      ></a-video>
+    </a-entity>
+
+    <a-entity id="target1" mindar-image-target="targetIndex: 1">
+      <a-video
+        src="#video1"
+        width="1"
+        height="1"
+        position="0 0.1 0"
+      ></a-video>
+    </a-entity>
+
+    <a-entity id="target2" mindar-image-target="targetIndex: 2">
+      <a-video
+        src="#video2"
+        width="1"
+        height="1"
+        position="0 0.1 0"
+      ></a-video>
+    </a-entity>
+
+    <a-entity id="target3" mindar-image-target="targetIndex: 3">
+      <a-video
+        src="#video3"
         width="1"
         height="1"
         position="0 0 0.01"
-        ></a-video>     
+      ></a-video>
+    </a-entity>
+
+    <a-entity id="target4" mindar-image-target="targetIndex: 4">
+      <a-video
+        src="#video4"
+        width="1"
+        height="1"
+        position="0 0 0.01"
+      ></a-video>
+    </a-entity>
+
+    <a-entity id="target5" mindar-image-target="targetIndex: 5">
+      <a-video
+        src="#video5"
+        width="1"
+        height="1"
+        position="0 0 0.01"
+      ></a-video>
+    </a-entity>
+    
+    <a-entity id="target6" mindar-image-target="targetIndex: 6">
+      <a-video
+        src="#video6"
+        width="1"
+        height="1"
+        position="0 0 0.01"
+      ></a-video>
     </a-entity>
   </a-scene>
 
   <script>
     const sceneEl = document.querySelector("a-scene");
     const startBtn = document.getElementById("startBtn");
-    const target = document.getElementById("target0");
-    const video = document.getElementById("aliveVideo");
+
+    const items = [
+      {
+        target: document.getElementById("target0"),
+        video: document.getElementById("video0"),
+      },
+      {
+        target: document.getElementById("target1"),
+        video: document.getElementById("video1"),
+      },
+      {
+        target: document.getElementById("target2"),
+        video: document.getElementById("video2"),
+      },
+      {
+        target: document.getElementById("target3"),
+        video: document.getElementById("video3"),
+      },
+      {
+        target: document.getElementById("target4"),
+        video: document.getElementById("video4"),
+      },
+      {
+        target: document.getElementById("target5"),
+        video: document.getElementById("video5"),
+      },
+      {
+        target: document.getElementById("target6"),
+        video: document.getElementById("video6"),
+      }
+    ];
 
     let started = false;
-    let audioUnlocked = false;
+
+    function stopAllVideos() {
+      items.forEach(({ video }) => {
+        video.pause();
+        video.currentTime = 0;
+      });
+    }
 
     startBtn.addEventListener("click", async () => {
-        await startBtn.remove();
+      startBtn.remove();
 
-        const mindarSystem = sceneEl.systems["mindar-image-system"];
-        if (!mindarSystem || started) return;
+      const mindarSystem = sceneEl.systems["mindar-image-system"];
+      if (!mindarSystem || started) return;
 
-        try {
-        video.muted = false;
-        video.playsInline = true;
+      try {
+        // Разблокируем видео после клика
+        for (const { video } of items) {
+          video.muted = false; // если нужен звук
+          video.playsInline = true;
 
-        try {
+          try {
             await video.play();
             video.pause();
             video.currentTime = 0;
-            audioUnlocked = true;
-        } catch (e) {
-            console.warn("Аудио не разблокировалось:", e);
+          } catch (e) {
+            console.warn("Не удалось разблокировать видео:", e);
+          }
         }
 
         await mindarSystem.start();
         started = true;
-        } catch (e) {
+      } catch (e) {
         console.error(e);
-        }
+      }
     });
 
-    target.addEventListener("targetFound", async () => {
+    items.forEach(({ target, video }) => {
+      target.addEventListener("targetFound", async () => {
         try {
-        video.currentTime = 0;
-        await video.play();
-        } catch (e) {
-        console.error("Ошибка запуска видео:", e);
-        }
-    });
+          stopAllVideos();
 
-    target.addEventListener("targetLost", () => {
+          video.currentTime = 0;
+          await video.play();
+        } catch (e) {
+          console.error("Ошибка запуска видео:", e);
+        }
+      });
+
+      target.addEventListener("targetLost", () => {
         video.pause();
         video.currentTime = 0;
+      });
     });
-    </script>
+  </script>
 </body>
 </html>
